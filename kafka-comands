@@ -1,0 +1,11 @@
+1. topics list
+kafka-topics --list --bootstrap-server localhost:9092
+
+2. Create topic
+kafka-topics --create --partitions 1 --replication-factor 1 --topic raw-weather --bootstrap-server localhost:9092
+
+3. Describe topic
+kafka-topics --describe --topic raw-weather --bootstrap-server localhost:9092
+
+4. Read topic
+kafka-console-consumer --topic raw-weather --from-beginning --bootstrap-server localhost:9092

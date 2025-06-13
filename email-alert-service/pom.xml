@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.comillas.alertsystem</groupId>
+    <artifactId>weather-alert-system</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>com.comillas.email</groupId>
+  <artifactId>email-alert-service</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <name>email-alert-service</name>
+  <url>http://maven.apache.org</url>
+
+  <dependencies>
+    <!-- Kafka -->
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka-clients</artifactId>
+      <version>3.7.0</version>
+    </dependency>
+
+    <!-- Jackson -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.17.0</version>
+    </dependency>
+
+    <!-- user-publisher -->
+    <dependency>
+      <groupId>com.comillas.user</groupId>
+      <artifactId>user-publisher</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+
+    <!-- alert-weather -->
+    <dependency>
+      <groupId>com.comillas.alert</groupId>
+      <artifactId>alert-weather</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+
+    <!-- SMTP Email. JavaMail para Java 8 -->
+    <dependency>
+      <groupId>com.sun.mail</groupId>
+      <artifactId>javax.mail</artifactId>
+      <version>1.6.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.10.0</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+</project>

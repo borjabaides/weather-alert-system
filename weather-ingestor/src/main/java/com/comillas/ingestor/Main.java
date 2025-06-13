@@ -1,0 +1,85 @@
+package com.comillas.ingestor;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.comillas.ingestor.model.WeatherEnriched;
+import com.comillas.ingestor.model.Minutely;
+import com.comillas.ingestor.model.WeatherRaw;
+import com.comillas.user.UserPublisher;
+
+import org.apache.kafka.clients.producer.*;
+import org.apache.kafka.common.serialization.StringSerializer;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        ScheduledTask.runWeatherTask();
+    }
+
+    static class ScheduledTask {
+        static void runWeatherTask() throws Exception {
+
+            String base = "https://api.openweathermap.org/data/3.0/onecall?lat=39.8&lon=-4&exclude=daily&appid=%s";
+            Properties apiProps = UserPublisher.loadPropertiesFromClasspath("weather-ingestor","api.properties");
+            String apiKey = apiProps.getProperty("OWM_API_KEY");
+            String url = String.format(base, apiKey);
+
+            // 1) HTTP GET
+            URL apiUrl = new URL(url);
+            HttpURLConnection conn = (HttpURLConnection) apiUrl.openConnection();
+            conn.setRequestMethod("GET");
+
+            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                System.err.println("HTTP error code: " + conn.getResponseCode());
+                conn.disconnect();
+                return;
+            }
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) sb.append(line);
+            reader.close();
+            conn.disconnect();
+
+            String message = sb.toString();
+            System.out.println("GET OpenWeather request successful with: (" + message.length() + " chars)");
+
+            ObjectMapper mapper = new ObjectMapper();
+            WeatherRaw raw = mapper.readValue(message, WeatherRaw.class);
+
+            // kafka producer config
+            Properties props = new Properties();
+            props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+            props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+            props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+            KafkaProducer<String, String> producer = new KafkaProducer<>(props);
+
+            // publish raw-weather
+            producer.send(new ProducerRecord<>("raw-weather", message));
+            System.out.println("Request to raw-weather topic sent");
+
+            // build and publish enriched-weather
+            if (raw.getMinutely() != null && !raw.getMinutely().isEmpty()) {
+                Minutely lastminute = raw.getMinutely().get(raw.getMinutely().size() - 1);
+                WeatherEnriched enriched = new WeatherEnriched(
+                        UUID.randomUUID().toString(),
+                        lastminute.precipitation,
+                        lastminute.dt,
+                        raw.getTimezone()
+                );
+                String enrichedJson = mapper.writeValueAsString(enriched);
+                producer.send(new ProducerRecord<>("enriched-weather", enrichedJson));
+                System.out.println("Summary to enriched-weather topic sent");
+            }
+
+            producer.flush();
+            producer.close();
+        }
+    }
+}
+
