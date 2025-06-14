@@ -19,17 +19,17 @@ import java.util.Properties;
 public class AlertWeather {
 
     public static void main(String[] args) throws Exception {
-        // Inicializa usuarios en memoria desde users.properties del classpath
+        // Inicializa usuarios en memoria desde users.properties
         List<User> users = UserPublisher.loadUsersFromClasspath();
         UserPublisher.indexUsersByZone(users);
 
         // Kafka Consumer
-        Properties consumerProps = new Properties();
-        consumerProps.put("bootstrap.servers", "localhost:9092");
-        consumerProps.put("group.id", "alert-weather");
-        consumerProps.put("key.deserializer", StringDeserializer.class.getName());
-        consumerProps.put("value.deserializer", StringDeserializer.class.getName());
-        KafkaConsumer<String, String> consumerWeather = new KafkaConsumer<>(consumerProps);
+        Properties weatherProps = new Properties();
+        weatherProps.put("bootstrap.servers", "localhost:9092");
+        weatherProps.put("group.id", "alert-weather");
+        weatherProps.put("key.deserializer", StringDeserializer.class.getName());
+        weatherProps.put("value.deserializer", StringDeserializer.class.getName());
+        KafkaConsumer<String, String> consumerWeather = new KafkaConsumer<>(weatherProps);
         consumerWeather.subscribe(Collections.singletonList("enriched-weather"));
 
         Properties userProps = new Properties();
@@ -45,8 +45,8 @@ public class AlertWeather {
         producerProps.put("bootstrap.servers", "localhost:9092");
         producerProps.put("key.serializer", StringSerializer.class.getName());
         producerProps.put("value.serializer", StringSerializer.class.getName());
-
         KafkaProducer<String, String> producer = new KafkaProducer<>(producerProps);
+
         ObjectMapper mapper = new ObjectMapper();
 
         System.out.println("AlertWeather active... Waiting events from enriched-weather");
@@ -59,19 +59,19 @@ public class AlertWeather {
                 System.out.printf("🧍 Usuario registrado: %s (%s)%n", user.name, user.zone);
             }
 
-            ConsumerRecords<String, String> records = consumerWeather.poll(Duration.ofSeconds(1));
-            for (ConsumerRecord<String, String> record : records) {
-                WeatherEnriched weather = mapper.readValue(record.value(), WeatherEnriched.class);
-                //List<User> users = UserPublisher.getUsersForZone(weather.timezone);
+            ConsumerRecords<String, String> weatherRecords = consumerWeather.poll(Duration.ofSeconds(1));
+            for (ConsumerRecord<String, String> weatherRecord : weatherRecords) {
+                WeatherEnriched weather = mapper.readValue(weatherRecord.value(), WeatherEnriched.class);
+                List<User> usersByZone = UserPublisher.getUsersForZone(weather.timezone);
 
-                for (User user : userList) {
-                    if (weather.precipitation >= user.threshold) {
-                        Alert alert = new Alert(user.name, user.mail, user.zone, weather.precipitation,
-                                user.threshold, weather.timestamp);
+                for (User userByzone : usersByZone) {
+                    if (weather.precipitation >= userByzone.threshold) {
+                        Alert alert = new Alert(userByzone.name, userByzone.mail, userByzone.zone, weather.precipitation,
+                                userByzone.threshold, weather.timestamp);
                         String json = mapper.writeValueAsString(alert);
                         producer.send(new ProducerRecord<>("alerts", json));
                         System.out.printf("Alert! %s (%s mm >= umbral %d mm)%n",
-                                user.name, weather.precipitation, user.threshold);
+                                userByzone.name, weather.precipitation, userByzone.threshold);
                     }
                 }
             }
