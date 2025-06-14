@@ -5,6 +5,7 @@ import com.comillas.ingestor.model.WeatherEnriched;
 import com.comillas.ingestor.model.Minutely;
 import com.comillas.ingestor.model.WeatherRaw;
 import com.comillas.user.UserPublisher;
+import com.comillas.ingestor.model.City;
 
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -23,10 +24,12 @@ public class Main {
     static class ScheduledTask {
         static void runWeatherTask() throws Exception {
 
-            String base = "https://api.openweathermap.org/data/3.0/onecall?lat=39.8&lon=-4&exclude=daily&appid=%s";
+            City madrid = new City(40.4168, -3.7038);
+
             Properties apiProps = UserPublisher.loadPropertiesFromClasspath("weather-ingestor","api.properties");
             String apiKey = apiProps.getProperty("OWM_API_KEY");
-            String url = String.format(base, apiKey);
+
+            String url = buildOpenWeatherApiUrl(madrid, "hourly,daily", apiKey);
 
             // 1) HTTP GET
             URL apiUrl = new URL(url);
@@ -80,6 +83,14 @@ public class Main {
             producer.flush();
             producer.close();
         }
+    }
+
+    private static String buildOpenWeatherApiUrl(City city, String exclude, String apiKey) {
+
+        String BASE_URL = "https://api.openweathermap.org/data/3.0/onecall";
+
+        return String.format("%s?lat=%f&lon=%f&exclude=%s&appid=%s",
+                        BASE_URL, city.lat, city.lon, exclude, apiKey);
     }
 }
 
