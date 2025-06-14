@@ -14,11 +14,25 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-public class Main {
+public class WeatherApp {
 
-    public static void main(String[] args) throws Exception {
-        ScheduledTask.runWeatherTask();
+    public static void main(String[] args) {
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
+                ScheduledTask.runWeatherTask();
+            } catch (Exception e) {
+                System.err.println("❌ Error ejecutando la tarea programada:");
+                e.printStackTrace();
+            }
+        }, 0, 1, TimeUnit.MINUTES); // ⏱️ Cada 1 minuto
+
+        System.out.println("⏳ Servicio de clima iniciado...");
     }
 
     static class ScheduledTask {
@@ -64,7 +78,7 @@ public class Main {
 
             // publish raw-weather
             producer.send(new ProducerRecord<>("raw-weather", message));
-            System.out.println("Request to raw-weather topic sent");
+            System.out.println("Request to raw-weather sent");
 
             // build and publish enriched-weather
             if (raw.getMinutely() != null && !raw.getMinutely().isEmpty()) {
@@ -77,7 +91,7 @@ public class Main {
                 );
                 String enrichedJson = mapper.writeValueAsString(enriched);
                 producer.send(new ProducerRecord<>("enriched-weather", enrichedJson));
-                System.out.println("Summary to enriched-weather topic sent");
+                System.out.println("Summary to enriched-weather sent: " + enrichedJson);
             }
 
             producer.flush();
