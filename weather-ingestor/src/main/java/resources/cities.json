@@ -1,3 +1,5 @@
 [
-  { "name": "Madrid", "lat": 40.4168, "lon": -3.7038 }
+  { "name": "Madrid", "lat": 40.4168, "lon": -3.7038 },
+  { "name": "Toledo", "lat": 39.47391, "lon": -4.02263 },
+  { "name": "Valencia", "lat": 39.47391, "lon": -0.37966 }
 ]

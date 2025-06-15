@@ -1,0 +1,6 @@
+[
+  { "name": "Borja", "id": 1, "mail": "borjamartinbaides@gmail.com", "zone": "Madrid", "threshold": 0 },
+  { "name": "Adrian", "id": 2, "mail": "adriansanzoficial@gmail.com", "zone": "Madrid", "threshold": 3},
+  { "name": "Marina", "id": 3, "mail": "garciamolineromarina@gmail.com", "zone": "Toledo", "threshold": 0},
+  { "name": "Pepe", "id": 4, "mail": "borjamartinbaides@gmail.com", "zone": "Valencia", "threshold": 0}
+]

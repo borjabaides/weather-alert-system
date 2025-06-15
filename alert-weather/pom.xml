@@ -37,10 +37,10 @@
       <version>1.0-SNAPSHOT</version>
     </dependency>
 
-    <!-- weather-ingestor -->
+    <!-- common -->
     <dependency>
-      <groupId>com.comillas.ingestor</groupId>
-      <artifactId>weather-ingestor</artifactId>
+      <groupId>com.comillas.common</groupId>
+      <artifactId>common</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
 

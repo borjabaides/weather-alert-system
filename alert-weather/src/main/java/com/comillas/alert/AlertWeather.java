@@ -1,10 +1,10 @@
 package com.comillas.alert;
 
+import com.comillas.common.model.Alert;
+import com.comillas.common.model.weather.WeatherEnriched;
+import com.comillas.common.model.User;
+import com.comillas.user.UserLoader;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.comillas.alert.model.Alert;
-import com.comillas.ingestor.model.WeatherEnriched;
-import com.comillas.user.UserPublisher;
-import com.comillas.user.model.User;
 
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.producer.*;
@@ -20,8 +20,8 @@ public class AlertWeather {
 
     public static void main(String[] args) throws Exception {
         // Inicializa usuarios en memoria desde users.properties
-        List<User> users = UserPublisher.loadUsersFromClasspath();
-        UserPublisher.indexUsersByZone(users);
+        List<User> users = UserLoader.loadUsers("user-publisher", "users.json");
+        UserLoader.indexUsersByZone(users);
 
         // Kafka Consumer
         Properties weatherProps = new Properties();
@@ -62,7 +62,7 @@ public class AlertWeather {
             ConsumerRecords<String, String> weatherRecords = consumerWeather.poll(Duration.ofSeconds(1));
             for (ConsumerRecord<String, String> weatherRecord : weatherRecords) {
                 WeatherEnriched weather = mapper.readValue(weatherRecord.value(), WeatherEnriched.class);
-                List<User> usersByZone = UserPublisher.getUsersForZone(weather.timezone);
+                List<User> usersByZone = UserLoader.getUsersForZone(weather.location);
 
                 for (User userByzone : usersByZone) {
                     if (weather.precipitation >= userByzone.threshold) {

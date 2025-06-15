@@ -10,6 +10,7 @@
     <module>alert-weather</module>
     <module>email-alert-service</module>
     <module>user-publisher</module>
+    <module>common</module>
   </modules>
 
   <properties>

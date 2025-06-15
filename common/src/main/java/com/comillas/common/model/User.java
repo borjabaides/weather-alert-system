@@ -1,8 +1,8 @@
-package com.comillas.user.model;
+package com.comillas.common.model;
 
 public class User {
     public String name;
-    public String user_id;
+    public int id;
     public String mail;
     public String zone;
     public int threshold;
@@ -11,9 +11,9 @@ public class User {
         // Jackson need this
     }
 
-    public User(String name, String user_id, String mail, String zone, int threshold) {
+    public User(String name, int id, String mail, String zone, int threshold) {
         this.name = name;
-        this.user_id = user_id;
+        this.id = id;
         this.mail = mail;
         this.zone = zone;
         this.threshold = threshold;

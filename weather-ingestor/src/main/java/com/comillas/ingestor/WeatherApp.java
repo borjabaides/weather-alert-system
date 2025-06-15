@@ -2,11 +2,9 @@ package com.comillas.ingestor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.comillas.ingestor.model.WeatherEnriched;
-import com.comillas.ingestor.model.Minutely;
-import com.comillas.ingestor.model.WeatherRaw;
-import com.comillas.user.UserPublisher;
-import com.comillas.ingestor.model.City;
+import com.comillas.common.model.weather.*;
+import com.comillas.common.model.City;
+import com.comillas.common.utils.ConfigLoader;
 
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -41,11 +39,9 @@ public class WeatherApp {
     static class ScheduledTask {
         static void runWeatherTask() throws Exception {
 
-            String fileName = "src/main/java/resources/cities.json";
-            String citiesPath = System.getProperty("user.dir") + File.separator + "weather-ingestor" + File.separator + fileName;
-            List<City> cities = CityLoader.loadFromJson(citiesPath);
+            List<City> cities = CityLoader.loadCities("weather-ingestor", "cities.json");
 
-            Properties apiProps = UserPublisher.loadProperties("weather-ingestor", "api.properties");
+            Properties apiProps = ConfigLoader.loadProperties("weather-ingestor", "api.properties");
             String apiKey = apiProps.getProperty("OWM_API_KEY");
 
             for (City city : cities) {
@@ -95,6 +91,7 @@ public class WeatherApp {
                             Minutely lastminute = raw.getMinutely().get(raw.getMinutely().size() - 1);
                             WeatherEnriched enriched = new WeatherEnriched(
                                     UUID.randomUUID().toString(),
+                                    city.name,
                                     lastminute.precipitation,
                                     lastminute.dt,
                                     raw.getTimezone()

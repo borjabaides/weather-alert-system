@@ -1,4 +1,4 @@
-package com.comillas.ingestor.model;
+package com.comillas.common.model.weather;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

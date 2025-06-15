@@ -1,4 +1,4 @@
-package com.comillas.ingestor.model;
+package com.comillas.common.model.weather;
 
 public class City {
 

@@ -1,4 +1,4 @@
-package com.comillas.alert.model;
+package com.comillas.common.model;
 
 public class Alert {
     public String name;

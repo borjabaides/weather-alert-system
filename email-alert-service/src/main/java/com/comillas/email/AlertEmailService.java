@@ -1,7 +1,7 @@
 package com.comillas.email;
 
-import com.comillas.user.UserPublisher;
-import com.comillas.alert.model.Alert;
+import com.comillas.common.utils.ConfigLoader;
+import com.comillas.common.model.Alert;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -15,7 +15,7 @@ import java.util.*;
 public class AlertEmailService {
 
     public static void main(String[] args) throws Exception {
-        Properties smtpProps = UserPublisher.loadPropertiesFromClasspath("email-alert-service","smtp.properties");
+        Properties smtpProps = ConfigLoader.loadProperties("email-alert-service","smtp.properties");
         String smtpUser = smtpProps.getProperty("smtp.user");
         String smtpPass = smtpProps.getProperty("smtp.pass");
 

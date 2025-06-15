@@ -1,6 +1,6 @@
 package com.comillas.email;
 
-import com.comillas.alert.model.Alert;
+import com.comillas.common.model.Alert;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
