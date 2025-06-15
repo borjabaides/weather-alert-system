@@ -1,6 +1,8 @@
 package com.comillas.ingestor.model;
 
 public class City {
+
+    public String name;
     public double lat;
     public double lon;
 
@@ -8,7 +10,8 @@ public class City {
         // Jackson need this
     }
 
-    public City(double lat, double lon) {
+    public City(String name, double lat, double lon) {
+        this.name = name;
         this.lat = lat;
         this.lon = lon;
     }
