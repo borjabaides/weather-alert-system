@@ -19,7 +19,7 @@ import java.util.Properties;
 public class AlertWeather {
 
     public static void main(String[] args) throws Exception {
-        // Inicializa usuarios en memoria desde users.properties
+        // Load users from users.json
         List<User> users = UserLoader.loadUsers("user-publisher", "users.json");
         UserLoader.indexUsersByZone(users);
 
@@ -55,8 +55,8 @@ public class AlertWeather {
             ConsumerRecords<String, String> userRecords = consumerUsers.poll(Duration.ofSeconds(1));
             for (ConsumerRecord<String, String> userRecord : userRecords) {
                 User user = mapper.readValue(userRecord.value(), User.class);
-                userList.add(user); // acumula usuarios
-                System.out.printf("🧍 Usuario registrado: %s (%s)%n", user.name, user.zone);
+                userList.add(user); // acumulates users
+                System.out.printf("🧍 Registered User : %s (%s)%n", user.name, user.zone);
             }
 
             ConsumerRecords<String, String> weatherRecords = consumerWeather.poll(Duration.ofSeconds(1));
@@ -70,7 +70,7 @@ public class AlertWeather {
                                 userByzone.threshold, weather.timestamp);
                         String json = mapper.writeValueAsString(alert);
                         producer.send(new ProducerRecord<>("alerts", json));
-                        System.out.printf("Alert! %s (%s mm >= umbral %d mm)%n",
+                        System.out.printf("Alert! %s (%s mm >= threshold %d mm)%n",
                                 userByzone.name, weather.precipitation, userByzone.threshold);
                     }
                 }

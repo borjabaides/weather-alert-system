@@ -28,12 +28,12 @@ public class WeatherApp {
                 ScheduledTask.runWeatherTask();
                 System.out.println(System.lineSeparator() + "⏳ Waiting for the next signal...in "+ freqTime + " minutes");
             } catch (Exception e) {
-                System.err.println("❌ Error ejecutando la tarea programada:");
+                System.err.println("❌ Error executing scheduled task:");
                 e.printStackTrace();
             }
-        }, 0, freqTime, TimeUnit.MINUTES); // ⏱️ Cada 60 minutos
+        }, 0, freqTime, TimeUnit.MINUTES); // ⏱️ Every 60 minutes
 
-        System.out.println("⏳ Servicio de clima iniciado...");
+        System.out.println("⏳ WeatherApp started...");
     }
 
     static class ScheduledTask {
@@ -110,7 +110,7 @@ public class WeatherApp {
                 } catch (Exception ex) {
                         System.err.println("❌ Error processing city: " + city.name);
                         ex.printStackTrace();
-                        // Continuamos con la siguiente ciudad
+                        // Continue with the next city
                 }
             }
         }

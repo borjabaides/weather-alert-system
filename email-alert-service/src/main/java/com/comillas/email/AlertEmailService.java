@@ -31,7 +31,7 @@ public class AlertEmailService {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        System.out.println("📨 EmailAlertService activo... esperando alertas");
+        System.out.println("📨 EmailAlertService active... waiting for alerts");
 
         while (true) {
             ConsumerRecords<String, String> records = consumer.poll(java.time.Duration.ofSeconds(1));
@@ -66,9 +66,9 @@ public class AlertEmailService {
                     alert.name, alert.precipitation, alert.zone, alert.threshold
             ));
             Transport.send(msg);
-            System.out.printf("✅ Email enviado a %s%n", alert.mail);
+            System.out.printf("✅ Email sent to %s%n", alert.mail);
         } catch (MessagingException e) {
-            System.err.printf("❌ Error al enviar correo a %s: %s%n", alert.mail, e.getMessage());
+            System.err.printf("❌ Error sending email to %s: %s%n", alert.mail, e.getMessage());
         }
     }
 }
